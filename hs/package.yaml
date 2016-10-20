@@ -1,0 +1,25 @@
+name: scripts
+version: 0.1.0.0
+
+ghc-options: -Wall
+
+default-extensions:
+  - LambdaCase
+  - OverloadedStrings
+  - ViewPatterns
+
+dependencies:
+  - base
+  - turtle
+
+library:
+  source-dirs: src
+
+executables:
+  safe_path_add:
+    main: SafePathAdd.hs
+    source-dirs: safe_path_add
+    dependencies:
+      - scripts
+
+

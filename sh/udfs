@@ -1,0 +1,142 @@
+#!/bin/bash
+
+# ========================= #
+# User-defined functions    #
+# ========================= #
+
+# Function h
+# @description alias for browsing history
+function h {
+  if [[ "$1" =~ "^\d+$" ]]; then
+    !$1
+  elif [ "$1" != "" ]; then
+    history | grep $1
+  else
+    history
+  fi
+}
+
+# Function l
+# @description alias for ls with flags
+function l {
+  if [ "$2" != "" ]; then
+    ls -halGpF $1 | grep $2
+    echo "--> grep $2"
+  elif [ -e "$1" ]; then
+    ls -halGpF $1
+  elif [ "$1" != "" ]; then
+    ls -halGpF | grep $1
+    echo "--> grep $1"
+  else
+    ls -halGpF
+  fi
+}
+
+# Function safe_path_add
+# @description add path to $PATH variable, if it is not already there.
+function safe_path_add {
+  PATH_FOUND=$(echo $PATH | grep -o -E "(^|:)$1" | head -1)
+
+  if [ -z $PATH_FOUND ] && [ -d $1 ]; then
+    export PATH=$PATH:$1
+  # else
+  #    test -z $PATH_FOUND && echo "$1 not a directory" || echo "$1 in PATH"
+  fi
+}
+
+# Function safe_prompt_add
+# @description add a command to the $PROMPT_COMMAND only if it is not already present
+function safe_prompt_add {
+  if [[ $PROMPT_COMMAND != *"$1"* ]]; then
+    export PROMPT_COMMAND="$1; $PROMPT_COMMAND"
+  fi
+}
+
+
+# Function append_history
+# @description After each command, append to the history file and reread it. To be used in $PROMPT_COMMAND
+function append_history {
+  history -a; history -c; history -r;
+}
+
+# Function append_history
+# @description log all commands to a logfile. To be used in $PROMPT_COMMAND
+function log_all_commands {
+   if [ $(id -u) -ne 0 ]; then
+     echo "$(date '+%Y-%m-%d.%H:%M:%S') $(pwd) $(history 1)" >> ~/.bash/log/bash-history-$(date '+%Y-%m-%d').log
+   fi
+}
+
+# Function myReload
+# @description source bashrc if in shell, rebuild stack if in stack project
+function myReload {
+  if [ -z "`ls | grep 'stack.yaml'`" ]; then
+    source ~/.bashrc
+  else
+    stack build
+  fi
+}
+
+# Function virtualenvPrompt
+# @description because of numerous PROMPT_COMMANDs, virtualenv gets overwritten.
+# Requires virtual environments to be written to a path including the phrase "virtualenv"
+#
+# @mutates variable venv_prompt
+function virtualenvPrompt {
+  if test -z "$VIRTUAL_ENV" ; then
+    venv_prompt=""
+  else
+    venv_prompt="${BLUE}[`basename \"$VIRTUAL_ENV\"`]${RESET} "
+  fi
+}
+
+# Function dotFolder
+# @description touch personal dot folder if it does not exist
+function dotFolder {
+  if [ ! -d $HOME/.stites/ ]; then
+    mkdir ~/.stites
+  fi
+}
+
+# Function notes
+# @description open up notes
+function notes {
+  dotFolder
+  vim ~/.stites
+}
+
+# Function workingmemory
+# @description open up workingmemory
+function workingmemory {
+  dotFolder
+  vim ~/.stites/workingmemory.md
+}
+
+# Function stack-intero
+# @description run stack ghci with intero as the backend
+# function run-stack-intero {
+#   stack ghci --with-ghc intero
+# }
+
+
+# ========================= #
+# Export functions          #
+# ========================= #
+export -f h
+export -f l
+export -f safe_path_add
+export -f safe_prompt_add
+export -f append_history;
+export -f log_all_commands;
+export -f myReload
+export -f virtualenvPrompt
+export -f dotFolder
+export -f notes
+export -f workingmemory
+# export -f run-stack-intero
+
+# ========================= #
+# Add functions to prompt   #
+# ========================= #
+safe_prompt_add "log_all_commands; virtualenvPrompt"
+

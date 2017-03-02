@@ -12,14 +12,15 @@ default-extensions:
 dependencies:
   - base
   - turtle
+  - directory
 
 library:
   source-dirs: src
 
-executable:
+executables:
   bk:
     source-dirs: exe
-    main-is: Bk.hs
+    main: Bk.hs
 
 tests:
   doctest:

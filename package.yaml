@@ -22,6 +22,46 @@ executables:
     source-dirs: exe
     main: Bk.hs
 
+  bkd:
+    source-dirs: exe
+    main: Bkd.hs
+
+#  safe_path_add:
+#    source-dirs: exe
+#    main: SafePathAdd.hs
+#
+#  safe_prompt_add:
+#    source-dirs: exe
+#    main: SafePromptAdd.hs
+#
+#  retry:
+#    source-dirs: exe
+#    main: Retry.hs
+#
+#  link_configs:
+#    source-dirs: exe
+#    main: LinkConfigs.hs
+#
+#  save_config_links:
+#    source-dirs: exe
+#    main: SaveConfigLinks.hs
+#
+#  bash_hs_reload:
+#    source-dirs: exe
+#    main: BashHsReload.hs
+#
+#  append_history:
+#    source-dirs: exe
+#    main: AppendHistory.hs
+#
+#  log_all_commands:
+#    source-dirs: exe
+#    main: LogAllCommands.hs
+#
+#  virtual_env_prompt:
+#    source-dirs: exe
+#    main: VirtualEnvPrompt.hs
+
 tests:
   doctest:
     main: DocTest.hs

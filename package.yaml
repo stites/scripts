@@ -1,7 +1,7 @@
 name: shell-binaries
 version: 0.1.0.0
 
-ghc-options: -Wall
+ghc-options: -Wall -O2 -threaded
 
 default-extensions:
   - BangPatterns

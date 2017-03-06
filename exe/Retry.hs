@@ -12,21 +12,20 @@ import Data.Maybe
 main :: IO ()
 main = do
   (cmd, ms, mn) <- options "retry a command" parser
-  go cmd (fromMaybe 15 ms) $ NominalDiffTime (fromMaybe 15 mn)
+  retry cmd (fromMaybe 15 ms) $ NominalDiffTime (fromMaybe 15 mn)
 
+retry :: Text -> NominalDiffTime -> Int -> IO ()
+retry cmd n = go'
   where
-    go :: Text -> NominalDiffTime -> Int -> IO ()
-    go cmd n = go'
-      where
-        go' :: Int -> IO ()
-        go' 0 = die (repr cmd <> " failed " <> repr n <> " times")
-        go' s =
-          shell cmd empty >>= \case
-            ExitSuccess   -> return ()
-            ExitFailure c -> do
-              print $ repr cmd <> " failed with exit code: " <> repr c
-              sleep n
-              go' (s-1)
+    go' :: Int -> IO ()
+    go' 0 = die (repr cmd <> " failed " <> repr n <> " times")
+    go' s =
+      shell cmd empty >>= \case
+        ExitSuccess   -> return ()
+        ExitFailure c -> do
+          print $ repr cmd <> " failed with exit code: " <> repr c
+          sleep n
+          go' (s-1)
 
 
 parser :: Parser (Text, Maybe Double, Maybe Int)

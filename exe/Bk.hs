@@ -1,5 +1,5 @@
 #!/usr/bin/env stack
--- stack --install-ghc runghc --package turtle
+-- stack --install-ghc runghc --package turtle --package exceptions
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveAnyClass #-}
 module Main where

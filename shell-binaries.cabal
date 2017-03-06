@@ -21,8 +21,6 @@ executable bk
     , filepath
     , exceptions
     , optparse-applicative
-  other-modules:
-      Bkd
   default-language: Haskell2010
 
 test-suite doctest

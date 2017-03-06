@@ -12,8 +12,6 @@ default-extensions:
 dependencies:
   - base
   - turtle
-  - directory
-  - filepath
   - exceptions
   - optparse-applicative
 

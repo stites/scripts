@@ -23,6 +23,10 @@ executables:
     source-dirs: exe
     main: Bk.hs
 
+  retry:
+    source-dirs: exe
+    main: Retry.hs
+
 #  safe_path_add:
 #    source-dirs: exe
 #    main: SafePathAdd.hs
@@ -30,10 +34,6 @@ executables:
 #  safe_prompt_add:
 #    source-dirs: exe
 #    main: SafePromptAdd.hs
-#
-#  retry:
-#    source-dirs: exe
-#    main: Retry.hs
 #
 #  link_configs:
 #    source-dirs: exe

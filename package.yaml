@@ -13,18 +13,17 @@ dependencies:
   - base
   - turtle
   - directory
+  - filepath
+  - exceptions
+  - optparse-applicative
 
-library:
-  source-dirs: src
+#library:
+#  source-dirs: src
 
 executables:
   bk:
     source-dirs: exe
     main: Bk.hs
-
-  bkd:
-    source-dirs: exe
-    main: Bkd.hs
 
 #  safe_path_add:
 #    source-dirs: exe

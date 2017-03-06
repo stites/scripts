@@ -21,10 +21,9 @@ parser = argPath "file" "The file to change extensions of"
 
 
 moveTo :: FilePath -> FilePath
-moveTo fp =
- if hasExtension fp "bk"
- then dropExtension fp
- else fp <.> "bk"
+moveTo fp
+  | hasExtension fp "bk" = dropExtension fp
+  | otherwise            = fp <.> "bk"
 
 
 checkFile :: FilePath -> IO ()

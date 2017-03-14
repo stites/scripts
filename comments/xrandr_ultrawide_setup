@@ -1,0 +1,3 @@
+xrandr --newmode "3440x1440_60" 419.50  3440 3696 4064 4688  1440 1443 1453 1493 -hsync +vsync
+xrandr --addmode default "3440x1440_60"
+xrandr --output default --auto --mode "3440x1440_60"

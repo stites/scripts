@@ -1,0 +1,3 @@
+xrandr --newmode "1600x1080_60"  144.00  1600 1704 1872 2144  1080 1083 1093 1120 -hsync +vsync
+xrandr --addmode default "1600x1080_60"
+xrandr --output default --auto --mode "1600x1080_60"

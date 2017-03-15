@@ -1,0 +1,75 @@
+name: shell-binaries
+version: 0.1.0.0
+
+ghc-options: -Wall -O2 -threaded
+
+default-extensions:
+  - BangPatterns
+  - LambdaCase
+  - OverloadedStrings
+  - ViewPatterns
+
+dependencies:
+  - base
+  - turtle
+  - exceptions
+  - optparse-applicative
+
+#library:
+#  source-dirs: src
+
+executables:
+  bk:
+    source-dirs: exe
+    main: Bk.hs
+
+  retry:
+    source-dirs: exe
+    main: Retry.hs
+
+#  safe_path_add:
+#    source-dirs: exe
+#    main: SafePathAdd.hs
+#
+#  safe_prompt_add:
+#    source-dirs: exe
+#    main: SafePromptAdd.hs
+#
+#  link_configs:
+#    source-dirs: exe
+#    main: LinkConfigs.hs
+#
+#  save_config_links:
+#    source-dirs: exe
+#    main: SaveConfigLinks.hs
+#
+#  bash_hs_reload:
+#    source-dirs: exe
+#    main: BashHsReload.hs
+#
+#  append_history:
+#    source-dirs: exe
+#    main: AppendHistory.hs
+#
+#  log_all_commands:
+#    source-dirs: exe
+#    main: LogAllCommands.hs
+#
+#  virtual_env_prompt:
+#    source-dirs: exe
+#    main: VirtualEnvPrompt.hs
+
+tests:
+  doctest:
+    main: DocTest.hs
+    source-dirs: test
+    dependencies:
+      - shell-binaries
+      - doctest
+
+  spec:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - shell-binaries
+      - hspec

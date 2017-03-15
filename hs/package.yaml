@@ -1,5 +1,8 @@
-name: shell-binaries
+name: scripts
 version: 0.1.0.0
+license: MIT
+license-file: ../LICENSE
+github: stites/scripts/hs
 
 ghc-options: -Wall -O2 -threaded
 

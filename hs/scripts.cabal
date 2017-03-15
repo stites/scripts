@@ -1,12 +1,20 @@
--- This file has been generated from package.yaml by hpack version 0.15.0.
+-- This file has been generated from package.yaml by hpack version 0.17.0.
 --
 -- see: https://github.com/sol/hpack
 
-name:           shell-binaries
+name:           scripts
 version:        0.1.0.0
-license-file:   LICENSE
+homepage:       https://github.com/stites/scripts#readme
+bug-reports:    https://github.com/stites/scripts/issues
+license:        MIT
+license-file:   ../LICENSE
 build-type:     Simple
 cabal-version:  >= 1.10
+
+source-repository head
+  type: git
+  location: https://github.com/stites/scripts
+  subdir: hs
 
 executable bk
   main-is: Bk.hs

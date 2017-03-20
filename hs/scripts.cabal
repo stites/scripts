@@ -25,9 +25,11 @@ executable bk
       base
     , turtle
     , exceptions
+    , text
     , optparse-applicative
   other-modules:
       Retry
+      SafePathAdd
   default-language: Haskell2010
 
 executable retry
@@ -39,9 +41,27 @@ executable retry
       base
     , turtle
     , exceptions
+    , text
     , optparse-applicative
   other-modules:
       Bk
+      SafePathAdd
+  default-language: Haskell2010
+
+executable safe_path_add
+  main-is: SafePathAdd.hs
+  hs-source-dirs:
+      exe
+  ghc-options: -Wall -O2 -threaded
+  build-depends:
+      base
+    , turtle
+    , exceptions
+    , text
+    , optparse-applicative
+  other-modules:
+      Bk
+      Retry
   default-language: Haskell2010
 
 test-suite doctest
@@ -54,6 +74,7 @@ test-suite doctest
       base
     , turtle
     , exceptions
+    , text
     , optparse-applicative
     , shell-binaries
     , doctest
@@ -71,6 +92,7 @@ test-suite spec
       base
     , turtle
     , exceptions
+    , text
     , optparse-applicative
     , shell-binaries
     , hspec

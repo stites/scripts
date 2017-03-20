@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Function virtualenvPrompt
+# @description because of numerous PROMPT_COMMANDs, virtualenv gets overwritten.
+# Requires virtual environments to be written to a path including the phrase "virtualenv"
+#
+# @mutates variable venv_prompt
+if test -z "$VIRTUAL_ENV" ; then
+  venv_prompt=""
+else
+  venv_prompt="${BLUE}[`basename \"$VIRTUAL_ENV\"`]${RESET} "
+fi
+
+

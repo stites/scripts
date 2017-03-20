@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Function dotFolder
+# @description touch personal dot folder if it does not exist
+if [ ! -d $HOME/.stites/ ]; then
+  mkdir ~/.stites
+fi
+
+

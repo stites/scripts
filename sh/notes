@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Function notes
+# @description open up notes
+dotFolder
+vim ~/.stites
+
+
+

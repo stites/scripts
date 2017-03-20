@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Function safe_prompt_add
+# @description add a command to the $PROMPT_COMMAND only if it is not already present
+if [[ $PROMPT_COMMAND != *"$1"* ]]; then
+  export PROMPT_COMMAND="$1; $PROMPT_COMMAND"
+fi
+
+
+

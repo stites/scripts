@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Function workingmemory
+# @description open up workingmemory
+dotFolder
+vim ~/.stites/workingmemory.md
+
+

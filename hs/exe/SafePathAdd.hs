@@ -11,14 +11,13 @@ import Turtle
 import qualified Data.Text as T
 import Control.Monad.Catch
 import Control.Arrow
-import Debug.Trace
+
 
 main :: IO ()
 main = do
   (dir, placement) <- (id *** placementFromBool) <$> options "safely add an existing directory to $PATH" parser
-  need "PATH" >>= \case
-    Just envPath -> safePathAdd dir placement envPath
-    Nothing      -> throwM NoPATHFound
+  Just envPath <- need "PATH"
+  safePathAdd dir placement envPath
 
 
 safePathAdd :: (MonadThrow io, MonadIO io) => FilePath -> Placement -> Text -> io ()
@@ -36,8 +35,8 @@ getSafePathAdd dir place path = do
       _    -> return   Nothing
   where
     appendPath :: Placement -> Text -> Text
-    appendPath Cons dir = dir  <> ":" <> path
-    appendPath Snoc dir = path <> ":" <>  dir
+    appendPath Cons dir' = dir' <> ":" <> path
+    appendPath Snoc dir' = path <> ":" <> dir'
 
     existsInPath :: [FilePath] -> Bool
     existsInPath dirs = null . filter (`elem` possible) . T.splitOn ":" $ path
@@ -91,9 +90,9 @@ data SafePathAddExceptions
 test :: IO ()
 test = do
   Just path <- need "PATH"
-  print "these should work"
-  let  canAdd = testpath path (Just True)
-  let cantAdd = testpath path Nothing
+  print ("these should work" :: Text)
+  let  canAdd = checkSPA path (Just True)
+  let cantAdd = checkSPA path Nothing
   canAdd "."
   canAdd ".."
   cantAdd "/bin"
@@ -101,11 +100,11 @@ test = do
   cantAdd "$HOME/.local/bin"
   cantAdd "~/.local/bin"
 
-  print "these should not work"
+  print ("these should not work" ::Text)
   getSafePathAdd "./foobar" Cons path >>= print
   getSafePathAdd "./stack.yaml" Cons path >>= print
   where
-    testpath path expect p = do
+    checkSPA path expect p = do
       rdir <- format fp <$> getExpandedPath p
       out <- getSafePathAdd p Cons path
       let res = not . null . filter (== rdir) . T.splitOn ":" <$> out

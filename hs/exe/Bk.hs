@@ -23,7 +23,7 @@ parser = argPath "file" "The file to change extensions of"
 moveTo :: FilePath -> FilePath
 moveTo file
   | hasExtension file "bk" = dropExtension file
-  | otherwise            = file <.> "bk"
+  | otherwise              = file <.> "bk"
 
 
 checkFile :: FilePath -> IO ()

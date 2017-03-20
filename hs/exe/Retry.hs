@@ -1,6 +1,7 @@
 #!/usr/bin/env stack
 -- stack --install-ghc runghc --package turtle
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE DeriveAnyClass #-}
 module Main where
 

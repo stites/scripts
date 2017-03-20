@@ -101,9 +101,13 @@ test = do
   cantAdd "~/.local/bin"
 
   print ("these should not work" ::Text)
-  getSafePathAdd "./foobar" Cons path >>= print
-  getSafePathAdd "./stack.yaml" Cons path >>= print
+  checkErr path "foobar"       $ \(SomeException e)     -> return ()
+  checkErr path "/foobar"      $ \(SomeException e)     -> return ()
+  checkErr path "./stack.yaml" $ \FoundFileNotDirectory -> return ()
   where
+    checkErr path p expect =
+      catch (getSafePathAdd p Cons path >> return ()) $ \e -> expect e >> print True
+
     checkSPA path expect p = do
       rdir <- format fp <$> getExpandedPath p
       out <- getSafePathAdd p Cons path

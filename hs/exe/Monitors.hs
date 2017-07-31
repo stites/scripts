@@ -16,21 +16,31 @@ main =
   >>= \case
     Sentenai -> xrandrWithExternal "3440x1440"
     Home     -> xrandrWithExternal "3840x1600"
-    Off      -> xrandrWith ["--output","HDMI-2","--off"]
-             >> xrandrWith ["--output","eDP-1","--mode","1920x1080","--auto"]
+    Off      -> xrandrWith (hdmi2With ["--off"])
+             >> xrandrWith (edp1With  ["--mode","1920x1080","--auto"])
   where
+    xrandrWith :: [Text] -> IO ()
     xrandrWith args = proc "xrandr" args empty >> pure ()
 
-    xrandrWithExternal res = xrandrWith
-      [ "--output", "HDMI-2", "--auto", "--mode",    res
-      , "--output", "eDP-1",  "--auto", "--same-as", "HDMI-2"
-      ]
+    xrandrWithExternal :: Text -> IO ()
+    xrandrWithExternal res = xrandrWith $
+         hdmi2With ["--auto", "--mode",    res]
+      <> edp1With  ["--auto", "--same-as", "HDMI-2"]
+
+    hdmi2With :: [Text] -> [Text]
+    hdmi2With = (outputOf "HDMI-2" <>)
+
+    edp1With  :: [Text] -> [Text]
+    edp1With  = (outputOf  "eDP-1" <>)
+
+    outputOf  :: Text -> [Text]
+    outputOf o = [ "--output",  o]
 
 
 data MonitorSettings
   = Sentenai
-  | Off
   | Home
+  | Off
   deriving (Eq, Ord, Show)
 
 

@@ -29,6 +29,11 @@ executables:
     source-dirs: exe
     main: SafePathAdd.hs
 
+  monitors:
+    source-dirs: exe
+    main: Monitors.hs
+
+
 #  safe_prompt_add:
 #    source-dirs: exe
 #    main: SafePromptAdd.hs

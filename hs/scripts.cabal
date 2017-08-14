@@ -1,4 +1,4 @@
--- This file has been generated from package.yaml by hpack version 0.17.0.
+-- This file has been generated from package.yaml by hpack version 0.17.1.
 --
 -- see: https://github.com/sol/hpack
 
@@ -26,6 +26,7 @@ executable bk
     , turtle
     , exceptions
     , text
+    , optional-args
     , optparse-applicative
   other-modules:
       Monitors
@@ -43,6 +44,7 @@ executable monitors
     , turtle
     , exceptions
     , text
+    , optional-args
     , optparse-applicative
   other-modules:
       Bk
@@ -60,6 +62,7 @@ executable retry
     , turtle
     , exceptions
     , text
+    , optional-args
     , optparse-applicative
   other-modules:
       Bk
@@ -77,6 +80,7 @@ executable safe_path_add
     , turtle
     , exceptions
     , text
+    , optional-args
     , optparse-applicative
   other-modules:
       Bk
@@ -95,6 +99,7 @@ test-suite doctest
     , turtle
     , exceptions
     , text
+    , optional-args
     , optparse-applicative
     , shell-binaries
     , doctest
@@ -113,6 +118,7 @@ test-suite spec
     , turtle
     , exceptions
     , text
+    , optional-args
     , optparse-applicative
     , shell-binaries
     , hspec

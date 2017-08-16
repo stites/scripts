@@ -26,8 +26,12 @@ main = do
              >> xrandrWith (edp1With  ["--off"])
              >> xrandrWith (edp1With  ["--mode","1920x1080","--auto"])
   where
+    -- runs xrandr before action so that monitors are detected
     xrandrWith :: [Text] -> IO ()
-    xrandrWith args = proc "xrandr" args empty >> pure ()
+    xrandrWith args = xrandrWith' [] >> xrandrWith' args
+
+    xrandrWith' :: [Text] -> IO ()
+    xrandrWith' args = proc "xrandr" args empty >> pure ()
 
     xrandrWithHDMI :: Bool -> Text -> IO ()
     xrandrWithHDMI mirror res = xrandrWith $

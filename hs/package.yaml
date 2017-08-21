@@ -22,6 +22,10 @@ executables:
     source-dirs: exe
     main: Bk.hs
 
+  replicate:
+    source-dirs: exe
+    main: Replicate.hs
+
   retry:
     source-dirs: exe
     main: Retry.hs

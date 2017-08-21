@@ -36,7 +36,7 @@ retry cmd n = go
 
 parser :: Parser (Text, Maybe Integer, Maybe Int)
 parser = (,,)
-  <$> argText "cmd" "the command to rerun in case of failure"
+  <$> optText "cmd" 'c' "the command to rerun in case of failure"
   <*> optional (optInteger "delay" 's' "seconds to between an attempt (default: 15s)")
   <*> optional (optInt  "retry" 'n' "number of times to retry (default: 15)")
 

@@ -34,6 +34,13 @@ executables:
     source-dirs: exe
     main: Monitors.hs
 
+  stacknew:
+    source-dirs: exe
+    main: StackNew.hs
+
+  est-shares:
+    source-dirs: exe
+    main: EstShares.hs
 
 #  safe_prompt_add:
 #    source-dirs: exe

@@ -26,7 +26,10 @@ replicateCmd cmd n left = do
   replicateCmd cmd n (left - 1)
 
 replicateCmd' :: Text -> NominalDiffTime -> IO ()
-replicateCmd' cmd n = runShell cmd >> sleep n
+replicateCmd' cmd n = do
+  runShell cmd
+  sleep n
+  replicateCmd' cmd n
 
 runShell :: Text -> IO ()
 runShell cmd =

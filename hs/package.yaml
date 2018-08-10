@@ -26,13 +26,13 @@ executables:
     source-dirs: exe
     main: Replicate.hs
 
-  retry:
-    source-dirs: exe
-    main: Retry.hs
+# retry:
+#   source-dirs: exe
+#   main: Retry.hs
 
-  safe_path_add:
-    source-dirs: exe
-    main: SafePathAdd.hs
+# safe_path_add:
+#   source-dirs: exe
+#   main: SafePathAdd.hs
 
   monitors:
     source-dirs: exe

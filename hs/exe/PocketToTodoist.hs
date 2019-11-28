@@ -6,14 +6,13 @@ module Main where
 
 import Prelude hiding (FilePath)
 import Text.HTML.TagSoup as TS
-import Turtle hiding (guard, ls, fp, empty)
-import Control.Monad hiding (guard)
+import Turtle hiding (guard, ls, fp, empty, stdout)
 import Control.Exception.Safe
 import Control.Effect.Error
 import Control.Effect.Empty
 import Control.Carrier.Empty.Maybe
 import Control.Carrier.Error.Either
-import Control.Lens
+import Control.Lens ((^.), (.~))
 import Data.List.NonEmpty (NonEmpty((:|)))
 import qualified Data.List.NonEmpty as NE
 import qualified Filesystem.Path.CurrentOS as FS
@@ -22,31 +21,46 @@ import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Read as TR
 import qualified Data.Text.IO as TIO
 import Network.Wreq (responseBody, responseStatus, statusCode, redirects, defaults, getWith)
-import qualified Streaming as S
 import qualified Streaming.Prelude as S
 import qualified Data.ByteString.Lazy as BS
+import System.IO (hFlush, stdout)
 
 main :: IO ()
 main = do
-  file <- options "convert a pocket export to a todoist project import file" parser
+  (file, force, out) <- options "convert a pocket export to a todoist project import file" parser
 
   runError (do
     ls <- taglines . TS.parseTags <$> getFile file
-    -- liftIO $ deleteFileLock file
+
+    when force $ do
+      deleteFileLock file
+      liftIO (rm out)
+
     ix <- liftIO $ readOrCreateFileLock file
-    liftIO $ print ix
-    sequence $ lineitem <$> drop ix ls
+    -- liftIO $ print ix
+    xs <- sequence $ lineitem <$> drop ix ls
+    pure (xs, ix)
     ) >>= \case
       Left txterr -> throwText txterr
-      Right xs -> S.print . S.mapM (go file) . S.take 3 $ S.each xs
+      Right (xs, start) -> S.mapM_ (go file (fromIntegral $ length xs) >=> write file out) . S.take 10 $ S.each $ zip [fromIntegral start..] xs
+  putStrLn ""
   where
-    parser :: Parser FilePath
-    parser = argPath "file" "HTML export file from pocket"
+    parser :: Parser (FilePath, Bool, FilePath)
+    parser = (,,)
+      <$> argPath "file" "HTML export file from pocket"
+      <*> switch "force" 'f' "overwrite the lock file"
+      <*> argPath "out" "output file to write to"
 
-    go :: FilePath -> LinkItem -> IO LinkItem
-    go fp li = runError (updateTitle fp li) >>= \case
-        Left err -> throwText err
-        Right li' -> pure li'
+    go :: FilePath -> Double -> (Double, LinkItem) -> IO LinkItem
+    go fp len (ix, li) = runError (updateTitle fp li) >>= \eli -> either throwText (\li' -> do
+      printf ("\r"%f%"%") $ (ix / len) * 100
+      hFlush stdout
+      pure li') eli
+
+    write :: FilePath -> FilePath -> LinkItem -> IO ()
+    write fp out li = do
+      TIO.appendFile (FS.encodeString out) $ asTodoistLine li
+      incFileLock fp
 
 getFile :: MonadIO io => Has (Throw Text) sig io => FilePath -> io Text
 getFile file =
@@ -124,17 +138,22 @@ updateTitle fp i@LinkItem{title, link} = liftIO $ do
   ret <-
     if not (isURL title)
     then pure i
-    else liftIO $ do
-      r <- getWith (defaults & redirects .~ 5) (T.unpack link)
-      if r ^. responseStatus . statusCode >= 200 && r ^. responseStatus . statusCode < 300
-      then case (partitions (\a -> isTagOpenName "title" a || isTagCloseName "title" a) $ parseTags (r ^. responseBody)) of
-          [] -> pure i
-          (a:_) -> pure $ i { title = TE.decodeUtf8 (BS.toStrict $ innerText a) }
-      else pure i
-  incFileLock fp
+    else if isPDF title
+      then pure i
+      else liftIO $ do
+        r <- getWith (defaults & redirects .~ 5) (T.unpack link)
+        if r ^. responseStatus . statusCode >= 200 && r ^. responseStatus . statusCode < 300
+        then case (partitions (\a -> isTagOpenName "title" a || isTagCloseName "title" a) $ parseTags (r ^. responseBody)) of
+            [] -> pure i
+            (a:_) -> pure $ i { title = TE.decodeUtf8 (BS.toStrict $ innerText a) }
+        else pure i
   pure ret
 
 throwText :: Text -> IO a
 throwText = throwString . T.unpack
 
+asTodoistLine :: LinkItem -> Text
+asTodoistLine LinkItem{tags, link, title} = T.intercalate " "
+  (("[" <> title <> "](" <> link <> ")"):((\t -> if t == "" then t else "@" <> t) <$> tags))
+  <> "\n"
 

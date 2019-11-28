@@ -141,3 +141,4 @@ flycheck_*.el
 
 # projectiles files
 .projectile
+stack.yaml.lock

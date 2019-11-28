@@ -13,43 +13,50 @@ dependencies:
   - text
   - optional-args
   - optparse-applicative
-
-#library:
-#  source-dirs: src
+  - safe-exceptions
+  - system-filepath # this is actually deprecated
 
 executables:
   bk:
     source-dirs: exe
     main: Bk.hs
+    other-modules: []
 
-  replicate:
-    source-dirs: exe
-    main: Replicate.hs
+# replicate:
+#   source-dirs: exe
+#   main: Replicate.hs
 
 # retry:
 #   source-dirs: exe
 #   main: Retry.hs
 
-# safe_path_add:
-#   source-dirs: exe
-#   main: SafePathAdd.hs
-
   monitors:
     source-dirs: exe
     main: Monitors.hs
+    other-modules: []
 
   stacknew:
     source-dirs: exe
     main: StackNew.hs
+    other-modules: []
 
-  est-shares:
+  pocket-to-todoist:
     source-dirs: exe
-    main: EstShares.hs
+    main: PocketToTodoist.hs
+    other-modules: []
+    dependencies:
+      - wreq
+      - tagsoup
+      - fused-effects >= 1.0.0.0
+      - monadIO
+      - streaming
+      - lens
+      - bytestring
 
-#  safe_prompt_add:
+#  est-shares:
 #    source-dirs: exe
-#    main: SafePromptAdd.hs
-#
+#    main: EstShares.hs
+
 #  link_configs:
 #    source-dirs: exe
 #    main: LinkConfigs.hs

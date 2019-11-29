@@ -13,6 +13,7 @@ import Control.Effect.Empty
 import Control.Carrier.Empty.Maybe
 import Control.Carrier.Error.Either
 import Control.Lens ((^.), (.~))
+import Data.List (genericLength)
 import Data.List.NonEmpty (NonEmpty((:|)))
 import qualified Data.List.NonEmpty as NE
 import qualified Filesystem.Path.CurrentOS as FS
@@ -20,7 +21,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Read as TR
 import qualified Data.Text.IO as TIO
-import Network.Wreq (responseBody, responseStatus, statusCode, redirects, defaults, getWith)
+import Network.Wreq (responseBody, responseStatus, statusCode, redirects, defaults, getWith, get)
 import qualified Streaming.Prelude as S
 import qualified Data.ByteString.Lazy as BS
 import System.IO (hFlush, stdout)
@@ -42,7 +43,7 @@ main = do
     pure (xs, ix)
     ) >>= \case
       Left txterr -> throwText txterr
-      Right (xs, start) -> S.mapM_ (go file (fromIntegral $ length xs) >=> write file out) . S.take 10 $ S.each $ zip [fromIntegral start..] xs
+      Right (xs, start) -> S.mapM_ (go (genericLength xs) >=> write file out) . S.take 10 $ S.each $ zip [fromIntegral start..] xs
   putStrLn ""
   where
     parser :: Parser (FilePath, Bool, FilePath)
@@ -51,8 +52,8 @@ main = do
       <*> switch "force" 'f' "overwrite the lock file"
       <*> argPath "out" "output file to write to"
 
-    go :: FilePath -> Double -> (Double, LinkItem) -> IO LinkItem
-    go fp len (ix, li) = runError (updateTitle fp li) >>= \eli -> either throwText (\li' -> do
+    go :: Double -> (Double, LinkItem) -> IO LinkItem
+    go len (ix, li) = runError (updateTitle li) >>= \eli -> either throwText (\li' -> do
       printf ("\r"%f%"%") $ (ix / len) * 100
       hFlush stdout
       pure li') eli
@@ -133,21 +134,17 @@ isURL t = (any (`T.isPrefixOf` t) ["https://", "http://"])
 isPDF :: Text -> Bool
 isPDF t = ".pdf" `T.isSuffixOf` t
 
-updateTitle :: MonadIO io => Has (Throw Text) sig io => FilePath -> LinkItem -> io LinkItem
-updateTitle fp i@LinkItem{title, link} = liftIO $ do
-  ret <-
-    if not (isURL title)
-    then pure i
-    else if isPDF title
-      then pure i
-      else liftIO $ do
-        r <- getWith (defaults & redirects .~ 5) (T.unpack link)
-        if r ^. responseStatus . statusCode >= 200 && r ^. responseStatus . statusCode < 300
-        then case (partitions (\a -> isTagOpenName "title" a || isTagCloseName "title" a) $ parseTags (r ^. responseBody)) of
-            [] -> pure i
-            (a:_) -> pure $ i { title = TE.decodeUtf8 (BS.toStrict $ innerText a) }
-        else pure i
-  pure ret
+updateTitle :: MonadIO io => Has (Throw Text) sig io => LinkItem -> io LinkItem
+updateTitle i@LinkItem{title, link} = maybe i id <$> liftIO (runEmpty maybeUpdate)
+  where
+    maybeUpdate :: MonadIO io => Has Empty sig io => io LinkItem
+    maybeUpdate = do
+      guard . not $ isURL title || isPDF title
+      -- else if isPDF title
+      r <- liftIO $ getWith (defaults & redirects .~ 5) (T.unpack link)
+      guard . not $ r ^. responseStatus . statusCode >= 200 && r ^. responseStatus . statusCode < 300
+      t <- titleTagText (r ^. responseBody)
+      pure $ i { title = t }
 
 throwText :: Text -> IO a
 throwText = throwString . T.unpack
@@ -156,4 +153,20 @@ asTodoistLine :: LinkItem -> Text
 asTodoistLine LinkItem{tags, link, title} = T.intercalate " "
   (("[" <> title <> "](" <> link <> ")"):((\t -> if t == "" then t else "@" <> t) <$> tags))
   <> "\n"
+
+newtype ArxivId = ArxivId Text
+  deriving (Eq, Show)
+
+titleTagText :: Has Empty sig m => BS.ByteString -> m Text
+titleTagText respbody =
+  case partitions (\a -> isTagOpenName "title" a || isTagCloseName "title" a) (parseTags respbody) of
+    [] -> empty
+    (a:_) -> pure . TE.decodeUtf8 . BS.toStrict $ innerText a
+
+getArxivTitle :: ArxivId -> IO (Maybe Text)
+getArxivTitle (ArxivId i) = do
+  r <- get $ "https://export.arxiv.org/api/query?id_list=" ++ T.unpack i
+  if r ^. responseStatus . statusCode >= 200 && r ^. responseStatus . statusCode < 300
+  then pure $ titleTagText (r ^. responseBody)
+  else pure Nothing
 
